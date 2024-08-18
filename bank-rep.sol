@@ -93,6 +93,7 @@ contract Bank {
       maxWith(amount)
     {
       token1.transferFrom(address(this), msg.sender, amount);
+      link[msg.sender].balance -= amount;
     }
 
     function deposit(uint256 amount)
@@ -101,5 +102,6 @@ contract Bank {
      minDep(amount)
      {
       token1.transferFrom(msg.sender, address(this), amount);
+      link[msg.sender].balance += amount;
     }
 }
