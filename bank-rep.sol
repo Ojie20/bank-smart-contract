@@ -54,7 +54,7 @@ contract Bank {
         link[msg.sender] = User({
             name: _name,
             addr: msg.sender,
-            balance: token1.balanceOf(msg.sender)
+            balance: 0
         });
     }
 
@@ -83,7 +83,7 @@ contract Bank {
     function getBalance() public view returns (uint256) {
         // Mapping always returns a value.
         // If the value was never set, it will return the default value.
-        return token1.balanceOf(msg.sender);
+        return link[msg.sender].balance;
     }
 
 
