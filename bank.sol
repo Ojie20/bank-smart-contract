@@ -22,22 +22,11 @@ contract Bank {
 
   // Enum definition
   enum Status {
+        Pending,
         Rejected,
         Successful
     }
 
-  // Enum declaration
-  Status public status;
-
-  // Change state to reject
-  function reject() public {
-        status = Status.Rejected;
-    }
-
-  // Change state to successful
-  function success() public {
-    status = Status.Successful;
-  }
   
   struct User{
       string name;
@@ -71,12 +60,12 @@ contract Bank {
     }
 
     modifier minDep(uint256 i) {
-        require(i > 50, "");
+        require(i > 50, "Deposit amount is too little");
         _;
     }
 
     modifier maxWith(uint256 i) {
-        require(i < 10000, "reject()");
+        require(i < 10000, "Withdrawal amount is too much");
         _;
     }
 
@@ -90,18 +79,34 @@ contract Bank {
     function withdraw(uint256 amount) 
       public
       detect1
-      maxWith(amount)
+      maxWith(amount) returns(Status)
     {
-      token1.transferFrom(address(this), msg.sender, amount);
+      Status status;
+      status = Status.Pending;
+      if (token1.transfer(msg.sender, amount)) {
+        status =Status.Successful;
+      } else {
+        status = Status.Rejected;
+        return status;
+      }
       link[msg.sender].balance -= amount;
+      return status;
     }
 
     function deposit(uint256 amount)
      public
      detect1
-     minDep(amount)
+     minDep(amount) returns(Status)
      {
-      token1.transferFrom(msg.sender, address(this), amount);
-      link[msg.sender].balance += amount;
+      Status status;
+      status = Status.Pending;
+      if (token1.transferFrom(msg.sender, address(this), amount)) {
+        status =Status.Successful;
+      } else {
+        status = Status.Rejected;
+        return status;
+      }
+      link[msg.sender].balance -= amount;
+      return status;
     }
 }
